@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+
+      body {
+        text-align: center;
+      }
+
+      svg {
+        margin-top: 32px;
+        border: 1px solid #aaa;
+      }
+
+      .person rect {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 1px;
+      }
+
+      .person {
+        font: 14px sans-serif;
+      }
+
+      .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 1.5px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id='solar-system'>
+      <svg></svg>
+    </div>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script>
+      var baseSvg = d3.select("#solar-system svg")
+                    .attr({
+                      width: 640,
+                      height: 480,
+                      class: 'overlay'
+                    }).style({
+                      background:'#036'
+                    }),
+          orbitObj = baseSvg.append('circle')
+                            .attr({
+                              r: 180,
+                              transform:'translate(320,240)rotate(0)'
+                            }).style({
+                              fill:'none',
+                              stroke: '#ccc',
+                              'stroke-width': 1,
+                              'stroke-dasharray':"1,4",
+                            }),
+          svgGroup = baseSvg.append("g")
+                            .attr('transform','translate(320,240)rotate(0)'),
+          rotateVal = 0,
+          tideAreaVal = 2400,
+          tideY = 42,
+          tideX = tideAreaVal/tideY,
+          tideObj = svgGroup.append('ellipse')
+                            .attr({
+                              rx: tideX,
+                              ry: tideY
+                            }).style({
+                              fill:'#6AF',
+                              stroke: 'blue',
+                              'stroke-width': 1
+                            }),
+          earthObj = svgGroup.append('circle')
+                            .attr({
+                              r: 40
+                            }).style({
+                              fill:'blue',
+                              stroke: 'none'
+                            }),
+          moonObj = svgGroup.append('circle')
+                            .attr({
+                              r: 12,
+                              cx:180
+                            }).style({
+                              fill:'#FC0',
+                              stroke: '#996',
+                              'stroke-width': 1
+                            });
+
+      var setTideAttr = function(){
+            var dVal = (tideAreaVal/42 - 51)/90;
+            rotateVal--;
+            if((rotateVal<=0 && rotateVal>-90)||(rotateVal<=-180 && rotateVal>-270)){
+              tideX-=dVal;
+              if(tideX<51){tideX=51;}
+            }else{
+              tideX+=dVal;
+              if(tideX>tideAreaVal/42){tideX=tideAreaVal/42;}
+            }
+            tideY = tideAreaVal/tideX;
+            tideObj.attr({rx: tideX,ry: tideY});
+            svgGroup.attr('transform','translate(320,240)rotate('+rotateVal+')');
+            if(rotateVal<=-360){
+              rotateVal = 0;
+            }
+            setTimeout(setTideAttr,50);
+      }
+
+      setTideAttr();
+
+    </script>
+  </body>
+</html>
